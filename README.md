@@ -1,7 +1,10 @@
 # 🖇 Porperty Indexer
 
-Indexes objects/arrays properties inside a key-value map.
-Based on symfony/property-access.
+A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
+
+*key* and *value* values are retreived from objects or arrays via symfony/property-access component.
+
+`PorpertyIndexer` are iterable. 
 
 
 ## Installation
@@ -15,12 +18,7 @@ composer require obernard/property-indexer
 git clone git@github.com:pytoccaz/php-property-indexer.git
 ```
 
-## Usage  
-
-PorpertyIndexer builds a key-value dictionary by retriving key and value from objects or arrays.
-
-
-### Index from objects
+## Index objects properties
 
 Say you have objects with properties `id` and `value`:
 ```php
@@ -42,12 +40,20 @@ $indexer = new Obernard\PropertyIndexer\PropertyIndexer('id', 'value');
 Add objects:
 ```php
 $indexer->add($object1)->add($object2);
+```
 
+Retreive indexed values via their key:
+```php
 $index->get('id1') //  returns "value1"
 $index->get('id2') //  returns "value2"
-
 ```
-### Index from arrays
+
+Or directly via a reference to an indexed object:
+```php
+$index->get($object2) //  returns "value2"
+```
+
+## Index array properties
 
 Say you have array maps with `id` and `value` keys:
 ```php
@@ -65,13 +71,16 @@ Add arrays:
 ```php
 $indexer->add($array1)->add($array2);
 ```
-retreive indexed values:
+Retreive indexed values via their key:
 ```php
 $index->get('id1') //  returns "value1"
 $index->get('id2') //  returns "value2"
 ```
+ 
+## Bulk Load collections
 
-### Bulk Load from collections
+Use the `load` method:
+
 ```php 
 $indexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', '[value]');
 $collection = [
@@ -83,12 +92,19 @@ $index->get('id1') //  returns value1
 $index->get('id2') //  returns value2
 ```
 
-### Index Objects or Arrays (not properties)  
+Or invoke `PropertyIndexer` with a third argument:
 
-Don't specify the value path to index the objects:
+```php
+$indexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', '[value]', $collection);
+```
+
+
+## Index Objects or Arrays (not their properties)  
+
+Don't specify the value path or set it to null when invoking `PropertyIndexer`:
 ```php 
 $objectIndexer = new Obernard\PropertyIndexer\PropertyIndexer('id');
-$arrayIndexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]');
+$arrayIndexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', null);
 ```
 
 ## Tests
@@ -104,4 +120,4 @@ Feel free to submit pull requests.
 
 MIT
 
-Copyright (c) 2021 Olivier BERNARD
+Copyright (c) 2022 Olivier BERNARD
