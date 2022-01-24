@@ -7,11 +7,11 @@ Based on symfony/property-access.
 ## Installation
 
 ```shell
-// from packagist
+# from packagist
 composer require obernard/property-indexer
 
 
-// or from github
+# or from github
 git clone git@github.com:pytoccaz/php-property-indexer.git
 ```
 
