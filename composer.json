@@ -1,5 +1,5 @@
 {
-    "name": "obernard/linkedlist",
+    "name": "obernard/property-indexer",
     "type": "library",
     "description": "A property indexer and accessor based on symfony/property-access for objects or arrays",
     "keywords": ["Index", "Collection", "Property", "Accessor"],
