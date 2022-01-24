@@ -82,9 +82,6 @@ $indexer = $indexer->load($collection);
 $index->get('id1') //  returns value1
 $index->get('id2') //  returns value2
 ```
-## Tests
-
-Run `composer test`.
 
 ### Index Objects or Arrays (not properties)  
 
@@ -93,6 +90,10 @@ Don't specify the value path to index the objects:
 $objectIndexer = new Obernard\PropertyIndexer\PropertyIndexer('id');
 $arrayIndexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]');
 ```
+
+## Tests
+
+Run `composer test`.
 
 
 ## Contributing
