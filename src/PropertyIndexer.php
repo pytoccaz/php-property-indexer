@@ -16,11 +16,8 @@ namespace Obernard\PropertyIndexer;
  * @author olivier Bernard
  */
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-
-class PropertyIndexer implements \Countable, \IteratorAggregate
+class PropertyIndexer extends PropertyPicker implements \Countable, \IteratorAggregate
 {
     /**
      * A Key-value mapper with:
@@ -53,10 +50,7 @@ class PropertyIndexer implements \Countable, \IteratorAggregate
      * @throws InvalidObjectException When trying to add an object/array that has no property verifying the key path          
      */
 
-    /**
-     * @var PropertyAccessor $pa For retriving key and value from added objects or arrays
-     **/
-    private PropertyAccessor $pa;
+ 
 
     /**
      * @var string $keyPath Compatible PropertyAccess path inside added objects for retriving key values
@@ -82,9 +76,7 @@ class PropertyIndexer implements \Countable, \IteratorAggregate
      */
     public function __construct(string $keyPath, ?string $valuePath = null, ?array $collection = null)
     {
-        $this->pa = PropertyAccess::createPropertyAccessorBuilder()
-            ->enableExceptionOnInvalidIndex()
-            ->getPropertyAccessor();
+        parent::__construct();
 
         $this->keyPath = $keyPath;
         $this->valuePath = $valuePath;
@@ -100,11 +92,7 @@ class PropertyIndexer implements \Countable, \IteratorAggregate
         return $this;
     }
 
-    private function getObjectAttr(object|array $object, string $path): mixed
-    {
-        return $this->pa->getValue($object, $path);
-    }
-
+ 
     /**
      * Loads a collection of compatible objects/arrays
      */
@@ -115,25 +103,20 @@ class PropertyIndexer implements \Countable, \IteratorAggregate
         }
         return $this;
     }
-
-    private function getPropertyFromObject(object|array $object, string $path): mixed
-    {
-        $this->objectOrArrayValidator($object, $path);
-        return $this->getObjectAttr($object, $path);
-    }
+ 
 
     private function getValueFromObject(object|array $object): mixed
     {
         if (!$this->valuePath)
             return $object;
 
-        return $this->getPropertyFromObject($object, $this->valuePath);
+        return self::getPropertyFromObject($object, $this->valuePath);
     }
 
 
     private function getKeyFromObject(object|array $object): string|int
     {
-        return $this->getPropertyFromObject($object, $this->keyPath);
+        return self::getPropertyFromObject($object, $this->keyPath);
     }
 
     /**
@@ -187,30 +170,14 @@ class PropertyIndexer implements \Countable, \IteratorAggregate
     {
         return array_keys($this->index);
     }
-
-    private function objectOrArrayValidator(object|array $object, string ...$properties): bool
-    {
-        foreach ($properties as $property) {
-
-            if (!$property)
-                continue;
-
-            if (!$this->pa->isReadable($object, $property))
-                if (is_object($object))
-                    throw new Exception\InvalidObjectException(sprintf("Property %s is not owned by the object !", $property));
-                else
-                    throw new Exception\InvalidArrayException(sprintf("Property %s is not owned by the array !", $property));
-        }
-        return true;
-    }
-
+ 
     /**
      *  Returns true if the object|array is compatible with the indexer
      */
     public function isValid(object|array $object): bool
     {
         try {
-            return $this->objectOrArrayValidator($object, $this->keyPath, $this->keyPath);
+            return self::objectOrArrayValidator($object, $this->keyPath, $this->keyPath);
         } catch (\Exception $e) {
             return false;
         }
