@@ -4,12 +4,12 @@ A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
 
 *key* and *value* values are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
 
-`PorpertyIndexer` are iterable. 
 
 
 A `PorpertyTreeBuilder` builds a tree-like structure from objects properties inside a collection.
 
 
+`PorpertyIndexer` and `PropertyTreeBuilder` are iterables. 
 
 
 ## Installation

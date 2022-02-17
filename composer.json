@@ -1,8 +1,8 @@
 {
     "name": "obernard/property-indexer",
     "type": "library",
-    "description": "A property indexer and accessor based on symfony/property-access for objects or arrays",
-    "keywords": ["Index", "Collection", "Property", "Accessor"],
+    "description": "Object property manipulation tools based on symfony/property-access",
+    "keywords": ["Index", "Collection", "Property", "Accessor", "GroupBy", "Tree"],
     "license": "MIT",
   
     "authors": [
