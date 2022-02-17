@@ -99,6 +99,14 @@ class PropertyBuilderTest extends TestCase
         }
     }
 
+    public function testClosure()
+    {
+        $object1 = self::simpleObjectWithDate(1, 'value1');
 
+        $tree = new PropertyTreeBuilder([$object1], 'value', function($item) { return $item->id*2; });
+        
+        $this->assertTrue(isset($tree[2]));   
+        $this->assertEquals('value1', $tree[2]);
+    }
 }
  

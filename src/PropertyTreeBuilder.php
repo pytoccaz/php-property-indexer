@@ -79,7 +79,7 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
      * @param $collection Collection of compatible objects/arrays to load.
      * 
      */
-    public function __construct(array $collection, ?string $valuePath = null, string ...$groupByProperties)
+    public function __construct(array $collection, ?string $valuePath = null, string|\Closure ...$groupByProperties)
     {
         parent::__construct();
 
@@ -87,7 +87,6 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
         $this->valuePath = $valuePath;
 
         $this->load($collection);
- 
     }
 
     /**
@@ -107,8 +106,14 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
                 $leafPath->appendIndex($this->count());
             else
                 foreach ($this->groupByProperties as $path) {
-                    // concat the path edges
-                    $leafPath->appendIndex(self::getPropertyFromObject($item, $path));
+                    
+                    if (is_string($path))
+                        // concat the path edges
+                        $leafPath->appendIndex(self::getPropertyFromObject($item, $path));
+ 
+                    else 
+                        // call the closure on the object item and append the result to the path definition
+                        $leafPath->appendIndex($path($item));
                 }
 
             // write the leaf
@@ -157,21 +162,24 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
     /**
      *   ArrayAccess interface implementation
      */
-    public function offsetExists(mixed $offset): bool {
+    public function offsetExists(mixed $offset): bool
+    {
         return isset($this->tree[$offset]);
     }
-    public function offsetGet(mixed $offset): mixed {
+    public function offsetGet(mixed $offset): mixed
+    {
         return $this->tree[$offset];
     }
-    public function offsetUnset(mixed $offset): void {
+    public function offsetUnset(mixed $offset): void
+    {
         unset($this->tree[$offset]);
     }
-    public function offsetSet($offset, $value):void {
+    public function offsetSet($offset, $value): void
+    {
         if (!is_null($offset)) {
             throw new Exception\OffsetSetException("Offset must be null");
         } else {
             $this->load([$value]);
         }
     }
- 
 }
