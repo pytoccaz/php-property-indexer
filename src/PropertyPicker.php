@@ -18,6 +18,8 @@ namespace Obernard\PropertyIndexer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathBuilder;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 
 class PropertyPicker  
@@ -64,6 +66,15 @@ class PropertyPicker
         }
         return true;
     }
+
+
+    protected static function setValue(array &$ar, string $path, mixed $value) {
+         self::$pa->setValue($ar, $path, $value);
+    }
  
- 
+
+    protected static function  createPropertyPath(PropertyPathInterface|string $path = null):PropertyPathBuilder {
+        return new PropertyPathBuilder($path);
+   }
+
 }

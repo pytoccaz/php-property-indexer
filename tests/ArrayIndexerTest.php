@@ -24,22 +24,8 @@ use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 class ArrayIndexerTest extends TestCase
 {
 
- 
-    private static function simpleArray(int|string $id, mixed $value): array
-    {
+    use TestsTrait;
 
-        return ['id' => $id, 'value' => $value];
-    }
-
- 
-    private static function getSimpleArraysCollection(int $n): array
-    {
-        $collection = [];
-        for ($i=1;$i<=$n;$i++) {
-            $collection[] = self::simpleArray($i, "Nice Value " . $i);
-        }
-        return $collection;
-    }
 
 
     public function testIndexerFilledWithArrays()
@@ -54,11 +40,11 @@ class ArrayIndexerTest extends TestCase
         $dico->add($myArray);
 
         $this->assertEquals(count($dico), 1);
-        $this->assertEquals($dico->get(1), 'Nice Value');
+        $this->assertEquals('Nice Value', $dico->get(1));
 
         $dico->add($myArray);
         $this->assertEquals(count($dico), 1);
-        $this->assertEquals($dico->get(1), 'Nice Value');
+        $this->assertEquals('Nice Value', $dico->get(1));
 
         $myArray2 = self::simpleArray('azerty', $myArray);
 
@@ -66,7 +52,7 @@ class ArrayIndexerTest extends TestCase
         $dico->add($myArray2);
 
         $this->assertEquals(count($dico), 2);
-        $this->assertEquals($dico->get('azerty'),  $myArray);
+        $this->assertEquals($myArray, $dico->get('azerty'));
     }
 
 
@@ -148,10 +134,10 @@ class ArrayIndexerTest extends TestCase
         $dico->add($array2);
         $dico->add($array3);
 
-        $this->assertEquals(count($dico), 3);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(3), 'Nice Value 3');
+        $this->assertEquals(3, count($dico));
+        $this->assertEquals( 'Nice Value 1', $dico->get(1));
+        $this->assertEquals( 'Nice Value 2', $dico->get(2));
+        $this->assertEquals( 'Nice Value 3', $dico->get(3));
     }
 
 
@@ -164,14 +150,14 @@ class ArrayIndexerTest extends TestCase
 
         $dico->add($myArray2);
 
-        $this->assertEquals($dico->get('nested'),  $myArray);
+        $this->assertEquals($myArray, $dico->get('nested'));
 
-        $this->assertEquals($dico->get('nested', '[value]'), 'Nice Value from flat object');
+        $this->assertEquals('Nice Value from flat object', $dico->get('nested', '[value]'));
 
 
-        $this->assertEquals($dico->get($myArray2),  $myArray);
+        $this->assertEquals($myArray,  $dico->get($myArray2));
 
-        $this->assertEquals($dico->get($myArray2, '[value]'), 'Nice Value from flat object');
+        $this->assertEquals('Nice Value from flat object', $dico->get($myArray2, '[value]'));
     }
 
 
@@ -182,10 +168,10 @@ class ArrayIndexerTest extends TestCase
         $collection = self::getSimpleArraysCollection(3);
         $dico->load($collection);
 
-        $this->assertEquals(count($dico), 3);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(3), 'Nice Value 3');
+        $this->assertEquals(3, count($dico));
+        $this->assertEquals( 'Nice Value 1', $dico->get(1));
+        $this->assertEquals( 'Nice Value 2', $dico->get(2));
+        $this->assertEquals( 'Nice Value 3', $dico->get(3));
     }
 
     public function testLoadCollectionOnInvocation()
@@ -193,10 +179,10 @@ class ArrayIndexerTest extends TestCase
         $collection = self::getSimpleArraysCollection(10);
         $dico = new PropertyIndexer('[id]', '[value]', $collection);
 
-        $this->assertEquals(count($dico), 10);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(10), 'Nice Value 10');
+        $this->assertEquals(10, count($dico));
+        $this->assertEquals( 'Nice Value 1', $dico->get(1));
+        $this->assertEquals( 'Nice Value 2', $dico->get(2));
+        $this->assertEquals( 'Nice Value 10', $dico->get(10));
     }
 
     public function testIter()

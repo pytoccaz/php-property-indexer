@@ -25,50 +25,33 @@ use Obernard\PropertyIndexer\Exception\UndefinedKeyException;
 class ObjectIndexerTest extends TestCase
 {
 
-    private static function simpleObject(int|string $id, mixed $value): \stdClass
-    {
-        $object = new \stdClass;
-        $object->value = $value;
-        $object->id = $id;
-
-        return $object;
-    }
-
-
-    private static function getSimpleObjectsCollection(int $n): array
-    {
-        $collection = [];
-        for ($i = 1; $i <= $n; $i++) {
-            $collection[] = self::simpleObject($i, "Nice Value " . $i);
-        }
-        return $collection;
-    }
+    use TestsTrait;
 
 
     public function testFillIndexer()
     {
         // create an obj indexer obj.id => obj.value
         $dico = new PropertyIndexer('id', 'value');
-        $this->assertEquals(count($dico), 0);
+        $this->assertEquals(0, count($dico));
 
         $myObject = self::simpleObject(1, 'Nice Value');
 
         $dico->add($myObject);
 
         $this->assertEquals(count($dico), 1);
-        $this->assertEquals($dico->get(1), 'Nice Value');
+        $this->assertEquals('Nice Value', $dico->get(1));
 
         $dico->add($myObject);
         $this->assertEquals(count($dico), 1);
-        $this->assertEquals($dico->get(1), 'Nice Value');
+        $this->assertEquals('Nice Value', $dico->get(1));
 
         $myObject2 = self::simpleObject('azerty', $myObject);
 
 
         $dico->add($myObject2);
 
-        $this->assertEquals(count($dico), 2);
-        $this->assertEquals($dico->get('azerty'),  $myObject);
+        $this->assertEquals(2, count($dico));
+        $this->assertEquals($myObject, $dico->get('azerty'));
     }
 
 
@@ -142,9 +125,9 @@ class ObjectIndexerTest extends TestCase
         $dico->add($myObject3);
 
         $this->assertEquals(count($dico), 3);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(3), 'Nice Value 3');
+        $this->assertEquals('Nice Value 1', $dico->get(1));
+        $this->assertEquals('Nice Value 2', $dico->get(2));
+        $this->assertEquals('Nice Value 3', $dico->get(3));
     }
 
 
@@ -157,14 +140,14 @@ class ObjectIndexerTest extends TestCase
 
         $dico->add($myObject2);
 
-        $this->assertEquals($dico->get('nested'),  $myObject);
+        $this->assertEquals($myObject, $dico->get('nested'));
 
-        $this->assertEquals($dico->get('nested', 'value'), 'Nice Value from flat object');
+        $this->assertEquals('Nice Value from flat object', $dico->get('nested', 'value'));
 
 
-        $this->assertEquals($dico->get($myObject2),  $myObject);
+        $this->assertEquals($myObject, $dico->get($myObject2));
 
-        $this->assertEquals($dico->get($myObject2, 'value'), 'Nice Value from flat object');
+        $this->assertEquals('Nice Value from flat object', $dico->get($myObject2, 'value'));
     }
 
 
@@ -178,10 +161,10 @@ class ObjectIndexerTest extends TestCase
 
         $dico->add($grandFatherObject);
 
-        $this->assertEquals($dico->get('grandFather'),  $grandFatherObject);
-        $this->assertEquals($dico->get('grandFather', 'value'),  $parentObject);
-        $this->assertEquals($dico->get('grandFather', 'value.value'),  $childObject);
-        $this->assertEquals($dico->get('grandFather', 'value.value.value'),  'Nice Value from child object');
+        $this->assertEquals($grandFatherObject, $dico->get('grandFather'));
+        $this->assertEquals($parentObject, $dico->get('grandFather', 'value'));
+        $this->assertEquals($childObject, $dico->get('grandFather', 'value.value'));
+        $this->assertEquals('Nice Value from child object', $dico->get('grandFather', 'value.value.value'));
 
     }
 
@@ -212,7 +195,7 @@ class ObjectIndexerTest extends TestCase
 
         $this->assertTrue($dico->get('with_method', 'connected'));
         $this->assertTrue($dico->get('with_method', 'hair'));
-        $this->assertEquals($dico->get('with_method', 'say'), 'hello');
+        $this->assertEquals('hello', $dico->get('with_method', 'say'));
     }
 
 
@@ -225,9 +208,9 @@ class ObjectIndexerTest extends TestCase
         $dico->load($collection);
 
         $this->assertEquals(count($dico), 3);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(3), 'Nice Value 3');
+        $this->assertEquals('Nice Value 1', $dico->get(1));
+        $this->assertEquals('Nice Value 2', $dico->get(2));
+        $this->assertEquals('Nice Value 3', $dico->get(3));
     }
 
     public function testLoadCollectionOnInvocation()
@@ -236,9 +219,9 @@ class ObjectIndexerTest extends TestCase
         $dico = new PropertyIndexer('id', 'value', $collection);
 
         $this->assertEquals(count($dico), 10);
-        $this->assertEquals($dico->get(1), 'Nice Value 1');
-        $this->assertEquals($dico->get(2), 'Nice Value 2');
-        $this->assertEquals($dico->get(10), 'Nice Value 10');
+        $this->assertEquals('Nice Value 1', $dico->get(1));
+        $this->assertEquals('Nice Value 2', $dico->get(2));
+        $this->assertEquals('Nice Value 10', $dico->get(10));
     }
 
     public function testIter()

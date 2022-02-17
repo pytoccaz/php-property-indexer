@@ -1,10 +1,15 @@
-# 🖇 Porperty Indexer
+# 🖇 Porperty Indexer & Tree builder
 
 A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
 
 *key* and *value* values are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
 
 `PorpertyIndexer` are iterable. 
+
+
+A `PorpertyTreeBuilder` builds a tree-like structure from objects properties inside a collection.
+
+
 
 
 ## Installation
@@ -18,7 +23,9 @@ composer require obernard/property-indexer
 git clone git@github.com:pytoccaz/php-property-indexer.git
 ```
 
-## Index objects properties
+## Porperty Indexer
+
+### Index objects properties
 
 Say you have objects with properties `id` and `value`:
 ```php
@@ -53,7 +60,7 @@ Or directly via a reference to an indexed object:
 $index->get($object2) //  returns "value2"
 ```
 
-## Index array properties
+### Index array properties
 
 Say you have array maps with `id` and `value` keys:
 ```php
@@ -77,7 +84,7 @@ $index->get('id1') //  returns "value1"
 $index->get('id2') //  returns "value2"
 ```
  
-## Bulk Load collections
+### Bulk Load collections
 
 Use the `load` method:
 
@@ -99,7 +106,7 @@ $indexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', '[value]', $coll
 ```
 
 
-## Index Objects or Arrays (not their properties)  
+### Index Objects or Arrays (not their properties)  
 
 Don't specify the value path or set it to null when invoking `PropertyIndexer`:
 ```php 
@@ -107,7 +114,60 @@ $objectIndexer = new Obernard\PropertyIndexer\PropertyIndexer('id');
 $arrayIndexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', null);
 ```
 
-## Tests
+## Porperty Tree Builder
+
+Say you have objects with properties `id`, `value` and `date`:
+```php
+$object1 = new \stdClass;
+$object1->id = "id1";
+$object1->value = "value1";
+$object1->date = "today";
+
+$object2 = new \stdClass;
+$object2->id = "id2";
+$object2->value = "value2";
+$object2->date = "today";
+
+// first arg is the collection of objects
+// second arg is the "leaves" value
+// the rest of args is a groupBy-like definition of the tree levels
+$tree = new Obernard\PropertyIndexer\PropertyTreeBuilder([$obj1, $obj2], 'value', 'id', 'date');
+       
+var_dump($tree);
+//   ["tree":"Obernard\PropertyIndexer\PropertyTreeBuilder":private]=>
+//   array(2) {
+//     ["id1"]=>
+//     array(1) {
+//       ["today"]=>
+//       string(6) "value1"
+//     }
+//     ["id2"]=>
+//     array(1) {
+//       ["today"]=>
+//       string(6) "value2"
+//     }
+//   }
+
+$tree = new Obernard\PropertyIndexer\PropertyTreeBuilder([$obj1, $obj2], 'value', 'date', 'id');
+var_dump($tree);
+//   ["tree":"Obernard\PropertyIndexer\PropertyTreeBuilder":private]=>
+//   array(1) {
+//     ["today"]=>
+//     array(2) {
+//       ["id1"]=>
+//       string(6) "value1"
+//       ["id2"]=>
+//       string(6) "value2"
+//     }
+//   }
+
+
+
+```
+
+
+
+## Tests 
 
 Run `composer test`.
 
