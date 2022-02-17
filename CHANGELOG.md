@@ -11,3 +11,9 @@ CHANGELOG
 -----
  * `PropertyIndex` class extends new `PropertyPicker` class 
  * create new `PropertyTreeBuilder` class 
+
+
+0.3 2022-02-17
+-----
+ * tree path edge definitions accept closures
+
