@@ -17,7 +17,7 @@ namespace Obernard\PropertyIndexer;
  */
 
 
-class PropertyTreeBuilder extends PropertyPicker implements \Countable, \IteratorAggregate, \ArrayAccess
+class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggregate, \ArrayAccess
 {
     /**
      * 
@@ -32,7 +32,7 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
      * 
      * 
      * To build a tree with prop3 values as leaves, prop1 as node of level 0, prop2 as node of level 1,
-     *   invoke PropertyTreeBuilder(collection, prop3, prop1, prop2)
+     *   invoke PropertyTree(collection, prop3, prop1, prop2)
      * 
      *   resultingtree = [
      *      "val1a" => ["val2a" => "val3a", "val2b" => val3b],
@@ -40,7 +40,7 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
      *   ]
      * 
      * To build a tree with prop3 values as leaves, prop1 as node of level 0 
-     *   invoke PropertyTreeBuilder(collection, prop3, prop1)
+     *   invoke PropertyTree(collection, prop3, prop1)
      * 
      *   resultingtree = [
      *      "val1a" => [ "val3b" ], // the last leaf with "val1a" path is kept
@@ -74,8 +74,8 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
 
 
     /**
-     * @param string $valuePath Path of the property inside added objects/arrays providing a key value
-     * @param string $groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
+     * @param string $valuePath Path of the property inside added objects/arrays providing a leaf value
+     * @param string|\Closure ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
      * @param $collection Collection of compatible objects/arrays to load.
      * 
      */
@@ -106,12 +106,12 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
                 $leafPath->appendIndex($this->count());
             else
                 foreach ($this->groupByProperties as $path) {
-                    
+
                     if (is_string($path))
                         // concat the path edges
                         $leafPath->appendIndex(self::getPropertyFromObject($item, $path));
- 
-                    else 
+
+                    else
                         // call the closure on the object item and append the result to the path definition
                         $leafPath->appendIndex($path($item));
                 }
@@ -135,7 +135,7 @@ class PropertyTreeBuilder extends PropertyPicker implements \Countable, \Iterato
 
 
     /**
-     *  Returns all the keys ok level 0
+     *  Returns all the keys of level 0
      */
     public function keys(): array
     {

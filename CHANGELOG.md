@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+1.0 2022-03-01
+-----
+ * rename `PropertyTreeBuilder` class into `PropertyTree` 
+
 0.1 2022-01-24
 -----
  * create `PropertyIndex` class 

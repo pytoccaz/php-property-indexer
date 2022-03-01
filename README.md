@@ -9,7 +9,7 @@ A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
 A `PorpertyTreeBuilder` builds a tree-like structure from objects properties inside a collection.
 
 
-`PorpertyIndexer` and `PropertyTreeBuilder` are iterables. 
+`PorpertyIndexer` and `PropertyTree` are iterables. 
 
 
 ## Installation
@@ -131,10 +131,10 @@ $object2->date = "today";
 // first arg is the collection of objects
 // second arg is the "leaves" value
 // the rest of args is a groupBy-like definition of the tree levels
-$tree = new Obernard\PropertyIndexer\PropertyTreeBuilder([$obj1, $obj2], 'value', 'id', 'date');
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', 'id', 'date');
        
 var_dump($tree);
-//   ["tree":"Obernard\PropertyIndexer\PropertyTreeBuilder":private]=>
+//   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
 //   array(2) {
 //     ["id1"]=>
 //     array(1) {
@@ -148,9 +148,9 @@ var_dump($tree);
 //     }
 //   }
 
-$tree = new Obernard\PropertyIndexer\PropertyTreeBuilder([$obj1, $obj2], 'value', 'date', 'id');
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', 'date', 'id');
 var_dump($tree);
-//   ["tree":"Obernard\PropertyIndexer\PropertyTreeBuilder":private]=>
+//   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
 //   array(1) {
 //     ["today"]=>
 //     array(2) {
