@@ -108,5 +108,17 @@ class PropertyBuilderTest extends TestCase
         $this->assertTrue(isset($tree[2]));   
         $this->assertEquals('value1', $tree[2]);
     }
+
+
+    public function testLeafClosure()
+    {
+        $object1 = self::simpleObjectWithDate(1, 'value1');
+
+        $tree = new PropertyTree([$object1], function($item) { return $item->id*2; }, function($item) { return $item->id*2; });
+        
+        $this->assertTrue(isset($tree[2]));   
+        $this->assertEquals(2, $tree[2]);
+    }
+
 }
  

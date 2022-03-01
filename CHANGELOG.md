@@ -4,6 +4,7 @@ CHANGELOG
 1.0 2022-03-01
 -----
  * rename `PropertyTreeBuilder` class into `PropertyTree` 
+ * let leaf Path ($valuePath arg) be a Closure
 
 0.1 2022-01-24
 -----

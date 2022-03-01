@@ -63,7 +63,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     /**
      * @var string $valuePath Compatible PropertyAccess path inside objects for retriving leaves values
      */
-    private ?string $valuePath;
+    private string|\closure|null $valuePath;
 
 
     /**
@@ -75,11 +75,11 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
     /**
      * @param string $valuePath Path of the property inside added objects/arrays providing a leaf value
-     * @param string|\Closure ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
+     * @param string|\Closure|null ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
      * @param $collection Collection of compatible objects/arrays to load.
      * 
      */
-    public function __construct(array $collection, ?string $valuePath = null, string|\Closure ...$groupByProperties)
+    public function __construct(array $collection, string|\closure|null $valuePath = null, string|\Closure ...$groupByProperties)
     {
         parent::__construct();
 
@@ -126,10 +126,14 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
     private function getValueFromObject(object|array $object): mixed
     {
-        if (!$this->valuePath)
+        if ($this->valuePath === null)
             return $object;
-
-        return self::getPropertyFromObject($object, $this->valuePath);
+        else if ($this->valuePath instanceof \Closure) {
+            $closure= $this->valuePath;
+            return ($closure($object));
+        }
+        else 
+            return self::getPropertyFromObject($object, $this->valuePath);
     }
 
 
