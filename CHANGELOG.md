@@ -5,6 +5,7 @@ CHANGELOG
 -----
  * rename `PropertyTreeBuilder` class into `PropertyTree` 
  * let leaf Path ($valuePath arg) be a Closure
+ * add tree and PropertyAccessor getters
 
 0.1 2022-01-24
 -----

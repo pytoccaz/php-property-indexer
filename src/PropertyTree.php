@@ -10,6 +10,8 @@
 
 namespace Obernard\PropertyIndexer;
 
+ 
+
 /**
  * Given a collection of arrays/objets, builds a tree with leaves values and path provided by the items in the collection. 
  * 
@@ -55,6 +57,11 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * 
      */
 
+    const SCALAR_LEAF = 1;
+    const ARRAY_LEAF = 2;
+
+
+
     /**
      * @var array $groupByProperties list of properties defining the structure of the tree from the root to the leaves
      */
@@ -70,7 +77,6 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * @var array root of the classifier tree 
      */
     private $tree = [];
-
 
 
     /**
@@ -117,7 +123,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
                 }
 
             // write the leaf
-            self::setValue($this->tree, $leafPath, $leaf);
+            $this->getPropertyAccessor()->setValue($this->tree, $leafPath, $leaf);
         }
 
         return $this;
@@ -129,14 +135,16 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
         if ($this->valuePath === null)
             return $object;
         else if ($this->valuePath instanceof \Closure) {
-            $closure= $this->valuePath;
+            $closure = $this->valuePath;
             return ($closure($object));
-        }
-        else 
+        } else
             return self::getPropertyFromObject($object, $this->valuePath);
     }
 
-
+    public function getTree(): array
+    {
+        return $this->tree;
+    }
 
     /**
      *  Returns all the keys of level 0

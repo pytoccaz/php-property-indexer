@@ -39,13 +39,13 @@ class PropertyPicker
         
     } 
 
-    private static function getObjectAttr(object|array $object, string $path): mixed
+    private static function getObjectAttr(object|array $object, string|PropertyPathInterface $path): mixed
     {
         return self::$pa->getValue($object, $path);
     }
 
  
-    protected static function getPropertyFromObject(object|array $object, string $path): mixed
+    protected static function getPropertyFromObject(object|array $object, string|PropertyPathInterface $path): mixed
     {
         self::objectOrArrayValidator($object, $path);
         return self::getObjectAttr($object, $path);
@@ -68,13 +68,19 @@ class PropertyPicker
     }
 
 
-    protected static function setValue(array &$ar, string $path, mixed $value) {
-         self::$pa->setValue($ar, $path, $value);
-    }
+    // protected static function setValue(array &$ar, string $path, mixed $value) {
+    //      self::$pa->setValue($ar, $path, $value);
+    // }
  
 
     protected static function  createPropertyPath(PropertyPathInterface|string $path = null):PropertyPathBuilder {
         return new PropertyPathBuilder($path);
+   }
+
+
+
+   public function getPropertyAccessor(): PropertyAccessor {
+        return self::$pa;
    }
 
 }

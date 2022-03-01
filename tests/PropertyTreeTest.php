@@ -120,5 +120,29 @@ class PropertyBuilderTest extends TestCase
         $this->assertEquals(2, $tree[2]);
     }
 
+    public function testAccessor() {
+        $object1 = self::simpleObject('id1', 'value1');
+        $object2 = self::simpleObject('id2', 'value2');
+        $ptree = new PropertyTree([ ], 'value', 'id');
+
+        $ptree[] =  $object1 ;
+
+        $tree = $ptree->getTree();
+        $this->assertIsArray($tree);
+
+        $pa = $ptree->getPropertyAccessor();
+
+        $this->assertTrue($pa->isReadable($tree, '[id1]'));
+        $this->assertFalse($pa->isReadable($tree, '[id2]'));
+
+        $ptree[] =  $object2 ;
+        $tree = $ptree->getTree();
+        
+        $this->assertTrue($pa->isReadable($tree, '[id2]'));
+
+    }
+
+
+
 }
  
