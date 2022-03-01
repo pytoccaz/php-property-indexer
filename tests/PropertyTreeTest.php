@@ -96,6 +96,20 @@ class PropertyBuilderTest extends TestCase
         }
     }
 
+
+    public function testIdentityValue()
+    {
+        $collection = self::getSimpleObjectsCollection(10);
+        $tree = new PropertyTree($collection, null, 'id');
+
+        $i = 0;
+        foreach ($tree as $key => $value) {
+            // $this->assertEquals("Nice Value " . $i, $value);
+            $this->assertEquals($collection[$i++], $value);
+        }
+    }
+
+
     public function testClosure()
     {
         $object1 = self::simpleObjectWithDate(1, 'value1');
