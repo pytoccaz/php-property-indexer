@@ -10,7 +10,7 @@
 
 namespace Obernard\PropertyIndexer;
 
- 
+
 
 /**
  * Given a collection of arrays/objets, builds a tree with leaves values and path provided by the items in the collection. 
@@ -57,10 +57,9 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * 
      */
 
+    // leaf $mode values
     const SCALAR_LEAF = 1;
     const ARRAY_LEAF = 2;
-
-
 
     /**
      * @var array $groupByProperties list of properties defining the structure of the tree from the root to the leaves
@@ -78,6 +77,12 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      */
     private $tree = [];
 
+
+    /**
+     * @var int mode type of leaves
+     */
+
+    private $mode = self::SCALAR_LEAF;
 
     /**
      * @param string $valuePath Path of the property inside added objects/arrays providing a leaf value
@@ -98,7 +103,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     /**
      * Loads a collection of compatible objects/arrays
      */
-    public function load(iterable $collection): self
+    public function load(iterable $collection = []): self
     {
         foreach ($collection as $item) {
             // extract the leaf value
@@ -123,8 +128,23 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
                 }
 
             // write the leaf
-            $this->getPropertyAccessor()->setValue($this->tree, $leafPath, $leaf);
+
+            if ($this->mode === self::SCALAR_LEAF)
+                $this->getPropertyAccessor()->setValue($this->tree, $leafPath, $leaf);
+            else // if ($this->mode === self::ARRAY_LEAF)
+            {
+                if ($this->getPropertyAccessor()->isReadable($this->tree, $leafPath)) {
+                    // append value to existing leaf
+                    $newLeaf = $this->getPropertyAccessor()->getValue($this->tree, $leafPath);
+                    $newLeaf[] = $leaf;
+                    $this->getPropertyAccessor()->setValue($this->tree, $leafPath, $newLeaf);
+                } else {
+                    // create new leaf
+                    $this->getPropertyAccessor()->setValue($this->tree, $leafPath, array($leaf));
+                }
+            }
         }
+
 
         return $this;
     }
@@ -144,6 +164,16 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     public function getTree(): array
     {
         return $this->tree;
+    }
+
+    public function setMode(int $mode = self::SCALAR_LEAF): self
+    {
+        if (!in_array($mode, [self::ARRAY_LEAF, self::SCALAR_LEAF]))
+            throw new Exception\UndefinedModeException("Unsupported mode");
+
+        $this->mode = $mode;
+
+        return $this;
     }
 
     /**

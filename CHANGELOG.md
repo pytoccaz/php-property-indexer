@@ -6,6 +6,7 @@ CHANGELOG
  * rename `PropertyTreeBuilder` class into `PropertyTree` 
  * let leaf Path ($valuePath arg) be a Closure
  * add tree and PropertyAccessor getters
+ * add mode ARRAY_LEAF to append values array-type leave when key path colision
 
 0.1 2022-01-24
 -----
