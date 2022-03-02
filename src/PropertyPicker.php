@@ -22,29 +22,32 @@ use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 
-class PropertyPicker  
+class PropertyPicker
 {
 
     /**
      * @var PropertyAccessor $pa For retriving properties from objects or arrays
      **/
-    private static PropertyAccessor $pa ;
+    private static PropertyAccessor $pa;
 
- 
+
     public function __construct()
     {
         self::$pa = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
-        
-    } 
+    }
 
     private static function getObjectAttr(object|array $object, string|PropertyPathInterface $path): mixed
     {
         return self::$pa->getValue($object, $path);
     }
 
- 
+    protected static function getValue(object|array $object, string|PropertyPathInterface $path): mixed
+    {
+        return self::getObjectAttr($object, $path);
+    }
+
     protected static function getPropertyFromObject(object|array $object, string|PropertyPathInterface $path): mixed
     {
         self::objectOrArrayValidator($object, $path);
@@ -68,19 +71,24 @@ class PropertyPicker
     }
 
 
-    // protected static function setValue(array &$ar, string $path, mixed $value) {
-    //      self::$pa->setValue($ar, $path, $value);
-    // }
- 
+    protected static function setValue(array &$ar, PropertyPathInterface|string $path, mixed $value):void
+    {
+        self::$pa->setValue($ar, $path, $value);
+    }
 
-    protected static function  createPropertyPath(PropertyPathInterface|string $path = null):PropertyPathBuilder {
+
+    protected static function  createPropertyPath(PropertyPathInterface|string $path = null): PropertyPathBuilder
+    {
         return new PropertyPathBuilder($path);
-   }
+    }
 
+    protected static function isReadable(array &$ar, PropertyPathInterface|string $path):?bool
+    {
+        return self::$pa->isReadable($ar, $path);
+    }
 
-
-   public function getPropertyAccessor(): PropertyAccessor {
+    public function getPropertyAccessor(): PropertyAccessor
+    {
         return self::$pa;
-   }
-
+    }
 }

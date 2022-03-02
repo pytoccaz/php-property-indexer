@@ -232,15 +232,38 @@ class PropertyBuilderTest extends TestCase
     }
 
 
-    public function testWithNestedObgects()
+    public function testWithNestedObjects()
     {
-        
+        $propertyObject1 = self::simpleObject('flat1', 'Nice Value 1 from flat object');
+        $propertyObject2 = self::simpleObject('flat2', 'Nice Value 2 from flat object');
 
-        $myObject = self::simpleObject('flat', 'Nice Value from flat object');
-        $myObject2 = self::simpleObject('nested', $myObject);
 
-        $ptree = new PropertyTree([$myObject2], null, 'value.id');
+        $obj1 = self::simpleObject('nested', $propertyObject1);
 
-        var_dump($ptree->getTree());
+        $obj2 = self::simpleObject('nested', $propertyObject2);
+
+        $ptree = new PropertyTree([$obj1, $obj2], 'value.value', 'value.id');
+
+        $this->assertEquals(array(
+            "flat1" => 'Nice Value 1 from flat object',
+            "flat2" => 'Nice Value 2 from flat object',
+        ), $ptree->getTree());
     }
+
+
+
+    public function testOnIterable()    
+    {
+        $collection = self::getSimpleObjectsCollection(10);
+        $ptree = new PropertyTree($collection, null);
+        $this->assertEquals($collection, $ptree->toArray());
+        $ptree2 = new PropertyTree($ptree, null, 'id');
+        $ptree3 = new PropertyTree($ptree2, null);
+
+        $this->assertEquals($collection, $ptree3->toArray());
+
+    }
+
+
+
 }
