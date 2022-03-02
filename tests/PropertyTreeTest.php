@@ -230,4 +230,17 @@ class PropertyBuilderTest extends TestCase
         $this->assertIsArray($tree[2]);
         $this->assertEquals(array(0 => 'Nice Value 3'), $tree[2]);
     }
+
+
+    public function testWithNestedObgects()
+    {
+        
+
+        $myObject = self::simpleObject('flat', 'Nice Value from flat object');
+        $myObject2 = self::simpleObject('nested', $myObject);
+
+        $ptree = new PropertyTree([$myObject2], null, 'value.id');
+
+        var_dump($ptree->getTree());
+    }
 }
