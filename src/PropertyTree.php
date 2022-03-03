@@ -13,7 +13,7 @@ namespace Obernard\PropertyIndexer;
 
 
 /**
- * Given a collection of arrays/objets, builds a tree with leaves values and path provided by the items in the collection. 
+ * Given a collection of arrays|objets, builds a tree with leaves values and path provided by the items in the collection. 
  * 
  * @author olivier Bernard
  */
@@ -34,9 +34,9 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * 
      * 
      * To build a tree with prop3 values as leaves, prop1 as node of level 0, prop2 as node of level 1,
-     *   invoke PropertyTree(collection, prop3, prop1, prop2)
+     *   invoke PropertyTree(collection, prop3, [prop1, prop2])
      * 
-     *   resultingtree = [
+     *   resultingTree = [
      *      "val1a" => ["val2a" => "val3a", "val2b" => val3b],
      *      "val3a" => ["val2a" => "val3a"]
      *   ]
@@ -44,12 +44,12 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * To build a tree with prop3 values as leaves, prop1 as node of level 0 
      *   invoke PropertyTree(collection, prop3, prop1)
      * 
-     *   resultingtree = [
-     *      "val1a" => [ "val3b" ], // the last leaf with "val1a" path is kept
+     *   resultingTree = [
+     *      "val1a" => [ "val3b" ], // the last object with "val1a" path is kept
      *      "val3a" => [ "val3a" ]
      *   ]
      * 
-     * Note that 2 identical path result in the last leaf to be kept. 
+     * Note that 2 identical path result in the last leaf to be kept whith SCALAR_LEAF mode on . 
      * 
      * Property path have to be compatible with Symfony PropertyAccess path.
      *  https://symfony.com/doc/current/components/property_access.html
@@ -62,32 +62,36 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     const ARRAY_LEAF = 2;
 
     /**
-     * @var array $groupByProperties list of properties defining the structure of the tree from the root to the leaves
+     * list of properties defining the the leaves path.  
+     * @var list<string|\Closure>  
      */
     private array $groupByProperties = [];
 
-    /**
-     * @var string $valuePath Compatible PropertyAccess path inside objects for retriving leaves values
+    /** 
+     * Compatible PropertyAccess path inside objects for retriving leaves values.
+     * @var string|\Closure|null 
      */
-    private string|\Closure|null $valuePath;
+    private $valuePath;
 
 
     /**
-     * @var array root of the classifier tree 
+     * root of the property tree
+     * @var array  
      */
     private $tree = [];
 
 
     /**
-     * @var int mode type of leaves
+     * type of leaves ( self::SCALAR_LEAF or self::ARRAY_LEAF )
+     * @var int 
      */
 
     private $mode;
 
     /**
      * @param iterable $collection Collection of compatible objects/arrays to load.
-     * @param string $valuePath Path of the property inside added objects/arrays providing a leaf value
-     * @param array(string|\Closure) ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
+     * @param string|\Closure|null $valuePath Path of the property inside added objects/arrays providing a leaf value
+     * @param list<string|\Closure>|string|\Closure|null $groupByProperties Path of the properties inside added objects/arrays whose values define the leaves path inside the tree
      * 
      */
     public function __construct(iterable $collection, string|\Closure|null $valuePath = null, array|string|\Closure|null $groupByProperties = null, $mode = self::SCALAR_LEAF)
@@ -121,7 +125,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
             $leafPath = self::createPropertyPath();
 
             if (empty($this->groupByProperties))
-                // just push the leaves in a flat tree
+                // just push the leaves in a flat array
                 $leafPath->appendIndex($this->count());
             else
                 foreach ($this->groupByProperties as $path) {
@@ -139,7 +143,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
             if ($this->mode === self::SCALAR_LEAF) {
                 self::setValue($this->tree, $leafPath, $leaf);
-            } else {
+            } else if ($this->mode === self::ARRAY_LEAF) {
                 if (self::isReadable($this->tree, $leafPath)) {
                     // append value to existing leaf
                     $newLeaf = self::getValue($this->tree, $leafPath);
@@ -149,6 +153,8 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
                     // create new leaf
                     self::setValue($this->tree, $leafPath, array($leaf));
                 }
+            } else {
+                throw new Exception\UndefinedModeException("Unsupported mode");
             }
         }
 
@@ -181,9 +187,6 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
     public function setMode(int $mode): self
     {
-        if (!in_array($mode, [self::ARRAY_LEAF, self::SCALAR_LEAF]))
-            throw new Exception\UndefinedModeException("Unsupported mode");
-
         $this->mode = $mode;
 
         return $this;

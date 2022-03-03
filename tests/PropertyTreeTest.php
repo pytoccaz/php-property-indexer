@@ -15,7 +15,7 @@ namespace Obernard\PropertyIndexer\Tests;
  */
 
 
-use  Obernard\PropertyIndexer\PropertyTree;
+use Obernard\PropertyIndexer\PropertyTree;
 use PHPUnit\Framework\TestCase;
 use Obernard\PropertyIndexer\Exception\OffsetSetException;
 
