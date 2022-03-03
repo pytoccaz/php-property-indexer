@@ -64,12 +64,12 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     /**
      * @var array $groupByProperties list of properties defining the structure of the tree from the root to the leaves
      */
-    private array $groupByProperties;
+    private array $groupByProperties = [];
 
     /**
      * @var string $valuePath Compatible PropertyAccess path inside objects for retriving leaves values
      */
-    private string|\closure|null $valuePath;
+    private string|\Closure|null $valuePath;
 
 
     /**
@@ -82,21 +82,29 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
      * @var int mode type of leaves
      */
 
-    private $mode = self::SCALAR_LEAF;
+    private $mode;
 
     /**
      * @param iterable $collection Collection of compatible objects/arrays to load.
      * @param string $valuePath Path of the property inside added objects/arrays providing a leaf value
-     * @param string|\Closure|null ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
+     * @param array(string|\Closure) ...$groupByProperties  Path of the properties inside added objects/arrays whose values define the complete leaf path inside the tree
      * 
      */
-    public function __construct(iterable $collection, string|\closure|null $valuePath = null, string|\Closure ...$groupByProperties)
+    public function __construct(iterable $collection, string|\Closure|null $valuePath = null, array|string|\Closure|null $groupByProperties = null, $mode = self::SCALAR_LEAF)
     {
+
+
         parent::__construct();
 
-        $this->groupByProperties = $groupByProperties;
-        $this->valuePath = $valuePath;
+        if (is_array($groupByProperties)) {
+            self::checkGoupByPropertyTypes(...$groupByProperties);
+            $this->groupByProperties = $groupByProperties;
+        }
+        else if (!!$groupByProperties)
+            $this->groupByProperties[]=$groupByProperties;
 
+        $this->valuePath = $valuePath;
+        $this->setMode($mode);
         $this->load($collection);
     }
 
@@ -129,10 +137,9 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
             // write the leaf
 
-            if ($this->mode === self::SCALAR_LEAF)
+            if ($this->mode === self::SCALAR_LEAF) {
                 self::setValue($this->tree, $leafPath, $leaf);
-            else // if ($this->mode === self::ARRAY_LEAF)
-            {
+            } else {
                 if (self::isReadable($this->tree, $leafPath)) {
                     // append value to existing leaf
                     $newLeaf = self::getValue($this->tree, $leafPath);
@@ -172,7 +179,7 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     }
 
 
-    public function setMode(int $mode = self::SCALAR_LEAF): self
+    public function setMode(int $mode): self
     {
         if (!in_array($mode, [self::ARRAY_LEAF, self::SCALAR_LEAF]))
             throw new Exception\UndefinedModeException("Unsupported mode");
@@ -229,5 +236,10 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
         } else {
             $this->load([$value]);
         }
+    }
+
+    public static function checkGoupByPropertyTypes(string|\Closure ...$groupByProperties): bool
+    {
+        return true;
     }
 }

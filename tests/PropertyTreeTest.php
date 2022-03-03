@@ -30,14 +30,14 @@ class PropertyBuilderTest extends TestCase
     {
         $collection = self::getSimple3PropertiesObjectCollection(3);
 
-        $this->assertEquals(3, count(new PropertyTree($collection, 'value', 'id1', 'id2')));
+        $this->assertEquals(3, count(new PropertyTree($collection, 'value', ['id1', 'id2'])));
 
         $object1 = self::simpleObjectWithDate('id1', 'value1');
         $object2 = self::simpleObjectWithDate('id2', 'value2');
 
 
-        $this->assertEquals(2, count(new PropertyTree([$object1, $object2], 'value', 'id', 'date')));
-        $this->assertEquals(1, count(new PropertyTree([$object1, $object2], 'value', 'date', 'id')));
+        $this->assertEquals(2, count(new PropertyTree([$object1, $object2], 'value', ['id', 'date'])));
+        $this->assertEquals(1, count(new PropertyTree([$object1, $object2], 'value', ['date', 'id'])));
     }
 
 
@@ -48,7 +48,7 @@ class PropertyBuilderTest extends TestCase
         $object3 = self::simpleObjectWithDate('id3', 'value3');
 
         // offsetSet
-        $tree = new PropertyTree([], 'value', 'id', 'date');
+        $tree = new PropertyTree([], 'value', ['id', 'date']);
         $this->assertEquals(0, count($tree));
 
         $tree[] =  $object2;
@@ -78,7 +78,7 @@ class PropertyBuilderTest extends TestCase
         $object1 = self::simpleObjectWithDate('id1', 'value1');
 
 
-        $tree = new PropertyTree([], 'value', 'id', 'date');
+        $tree = new PropertyTree([], 'value', ['id', 'date']);
         $tree[0] =  $object1;
     }
 
@@ -264,6 +264,14 @@ class PropertyBuilderTest extends TestCase
 
     }
 
+    public function testPropertiesType()    
+    {
+        $props = ['test', function(){}];
+        $test = PropertyTree::checkGoupByPropertyTypes(...$props);
+
+        $this->assertTrue($test);
+
+    }
 
 
 }

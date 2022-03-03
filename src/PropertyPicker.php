@@ -82,7 +82,7 @@ class PropertyPicker
         return new PropertyPathBuilder($path);
     }
 
-    protected static function isReadable(array &$ar, PropertyPathInterface|string $path):?bool
+    protected static function isReadable(array $ar, PropertyPathInterface|string $path):?bool
     {
         return self::$pa->isReadable($ar, $path);
     }
