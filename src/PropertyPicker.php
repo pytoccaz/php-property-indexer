@@ -71,7 +71,7 @@ class PropertyPicker
     }
 
 
-    protected static function setValue(array &$ar, PropertyPathInterface|string $path, mixed $value):void
+    protected static function setValue(array &$ar, PropertyPathInterface|string $path, mixed $value): void
     {
         self::$pa->setValue($ar, $path, $value);
     }
@@ -82,7 +82,7 @@ class PropertyPicker
         return new PropertyPathBuilder($path);
     }
 
-    protected static function isReadable(array $ar, PropertyPathInterface|string $path):?bool
+    protected static function isReadable(array $ar, PropertyPathInterface|string $path): ?bool
     {
         return self::$pa->isReadable($ar, $path);
     }

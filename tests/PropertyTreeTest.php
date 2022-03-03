@@ -252,7 +252,7 @@ class PropertyBuilderTest extends TestCase
 
 
 
-    public function testOnIterable()    
+    public function testOnIterable()
     {
         $collection = self::getSimpleObjectsCollection(10);
         $ptree = new PropertyTree($collection, null);
@@ -261,17 +261,14 @@ class PropertyBuilderTest extends TestCase
         $ptree3 = new PropertyTree($ptree2, null);
 
         $this->assertEquals($collection, $ptree3->toArray());
-
     }
 
-    public function testPropertiesType()    
+    public function testPropertiesType()
     {
-        $props = ['test', function(){}];
+        $props = ['test', function () {
+        }];
         $test = PropertyTree::checkGoupByPropertyTypes(...$props);
 
         $this->assertTrue($test);
-
     }
-
-
 }

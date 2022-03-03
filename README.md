@@ -1,16 +1,14 @@
 # 🖇 Porperty Indexer & Tree builder
 
-A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
-
-*key* and *value* values are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
+* A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
 
 
-
-A `PorpertyTreeBuilder` builds a tree-like structure from objects properties inside a collection.
+* A `PorpertyTree` builds a Tree structure from a collection of objects.
 
 
 `PorpertyIndexer` and `PropertyTree` are iterables. 
 
+*key* and *value* values are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
 
 ## Installation
 
@@ -25,18 +23,22 @@ git clone git@github.com:pytoccaz/php-property-indexer.git
 
 ## Porperty Indexer
 
+A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
+
+Choose :
+* a string|int property to provide keys
+* a mixed property or the objects|arrays themselves to provide values
+
+
 ### Index objects properties
 
 Say you have objects with properties `id` and `value`:
 ```php
-$object1 = new \stdClass;
-$object1->id = "id1";
-$object1->value = "value1";
+$obj1->id == "id1";
+$obj1->value == "value1";
 
-$object2 = new \stdClass;
-$object2->id = "id2";
-$object2->value = "value2";
-
+$obj2->id == "id2";
+$obj2->value == "value2";
 ```
 
 Create an indexer for *id&value* objects :
@@ -46,7 +48,7 @@ $indexer = new Obernard\PropertyIndexer\PropertyIndexer('id', 'value');
 
 Add objects:
 ```php
-$indexer->add($object1)->add($object2);
+$indexer->add($obj1)->add($obj2);
 ```
 
 Retreive indexed values via their key:
@@ -57,7 +59,7 @@ $index->get('id2') //  returns "value2"
 
 Or directly via a reference to an indexed object:
 ```php
-$index->get($object2) //  returns "value2"
+$index->get($obj2) //  returns "value2"
 ```
 
 ### Index array properties
@@ -116,24 +118,28 @@ $arrayIndexer = new Obernard\PropertyIndexer\PropertyIndexer('[id]', null);
 
 ## Porperty Tree Builder
 
+A `PorpertyTree` builds a Tree structure from a collection of objects.
+
+Leaves path and values are picked from the items of the processed collection.
+
+
+### Porperty Tree basics 
+
+
 Say you have objects with properties `id`, `value` and `date`:
 ```php
-$object1 = new \stdClass;
-$object1->id = "id1";
-$object1->value = "value1";
-$object1->date = "today";
+$obj1->id == "id1";
+$obj1->value == "value1";
+$obj1->date == "today";
 
-$object2 = new \stdClass;
-$object2->id = "id2";
-$object2->value = "value2";
-$object2->date = "today";
+$obj2->id == "id2";
+$obj2->value == "value2";
+$obj2->date == "today"; 
 
 // first arg is the collection of objects
 // second arg is the "leaves" value
-// the rest of args is a groupBy-like definition of the tree levels
-$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', 'id', 'date');
-       
-var_dump($tree);
+// third arg is a groupBy-like definition of the tree levels
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['id', 'date']);
 //   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
 //   array(2) {
 //     ["id1"]=>
@@ -148,8 +154,7 @@ var_dump($tree);
 //     }
 //   }
 
-$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', 'date', 'id');
-var_dump($tree);
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['date', 'id']);
 //   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
 //   array(1) {
 //     ["today"]=>
@@ -160,12 +165,84 @@ var_dump($tree);
 //       string(6) "value2"
 //     }
 //   }
-
-
-
 ```
 
+### Porperty Tree modes ARRAY_LEAF 
 
+Mind the possible colisions between objects sharing the "same" properties path:
+
+``` php
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['date']);
+//   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
+//   array(1) {
+//     ["today"]=>
+//     string(6) "value2"
+//   }
+```
+To avoid possible colisions, switch to array-type leaves:
+
+```php
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['date'], PropertyTree::ARRAY_LEAF);
+//   ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
+//   array(1) {
+//     ["today"]=>
+//     array(2) {
+//       [0]=>
+//       string(6) "value1"
+//       [1]=>
+//       string(6) "value2"
+//     }
+//   }
+```
+
+### Porperty Tree advanced features
+
+### Closure as valuePath  
+
+`$valuePath` 2nd arg accepts a one-arg Closure (that must return int|string). While iterating the object|array collection, PorpertyTree will bind the arg with the current object|array item to extract a value.
+
+To retrieve the object items themselves, you may use an Identity Closure (or set `valuePath` to `null`) :
+
+```php
+// Use an Idendity Closure to retrieve Objects themselves: 
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], function($item):string {return $item;}, ['id']);
+  ["tree":"Obernard\PropertyIndexer\PropertyTree":private]=>
+//   array(2) {
+//     ["id1"]=>
+//     object(stdClass)#106 (3) {
+//       ["id"]=>
+//       string(3) "id1"
+//       ["value"]=>
+//       string(6) "value1"
+//       ["date"]=>
+//       string(5) "today"
+//     }
+//     ["id2"]=>
+//     object(stdClass)#83 (3) {
+//       ["id"]=>
+//       string(3) "id2"
+//       ["value"]=>
+//       string(6) "value2"
+//       ["date"]=>
+//       string(5) "today"
+//     }
+//   }
+
+
+// Or a simple way :
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], null, ['id']);
+```
+
+### Closure as groupByproperties  
+
+array `$groupByproperties` 3nd arg accepts one-arg Closures (that must return int|string). While iterating the object|array collection, PorpertyTree will bind the arg with the current object|array item to extract a tree-path node :  
+
+```php
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], null, [function($item):string {return $item->id;}]);
+
+// is a complicated way to get the same resulting tree as : 
+$tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], null, ['id']);
+```
 
 ## Tests 
 

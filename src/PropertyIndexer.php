@@ -70,11 +70,11 @@ class PropertyIndexer extends PropertyPicker implements \Countable, \IteratorAgg
 
     /**
      * @param string $keyPath Path of the property inside added objects/arrays providing a key value
-     * @param string $valuePath Path of the property inside added objects/arrays providing the value associated to the key
-     * @param $collection Collection of compatible objects/arrays to load.
+     * @param string|null $valuePath Path of the property inside added objects/arrays providing the value associated to the key
+     * @param iterable $collection Collection of compatible objects/arrays to load.
      * 
      */
-    public function __construct(string $keyPath, ?string $valuePath = null, ?array $collection = null)
+    public function __construct(string $keyPath, ?string $valuePath = null, ?iterable $collection = null)
     {
         parent::__construct();
 

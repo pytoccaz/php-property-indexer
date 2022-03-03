@@ -103,9 +103,8 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
         if (is_array($groupByProperties)) {
             self::checkGoupByPropertyTypes(...$groupByProperties);
             $this->groupByProperties = $groupByProperties;
-        }
-        else if (!!$groupByProperties)
-            $this->groupByProperties[]=$groupByProperties;
+        } else if (!!$groupByProperties)
+            $this->groupByProperties[] = $groupByProperties;
 
         $this->valuePath = $valuePath;
         $this->setMode($mode);

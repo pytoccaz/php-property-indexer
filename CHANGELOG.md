@@ -1,12 +1,7 @@
 CHANGELOG
 =========
 
-1.0 2022-03-01
------
- * rename `PropertyTreeBuilder` class into `PropertyTree` 
- * let leaf Path ($valuePath arg) be a Closure
- * add tree and PropertyAccessor getters
- * add mode ARRAY_LEAF to append values array-type leave when key path colision
+
 
 0.1 2022-01-24
 -----
@@ -24,3 +19,13 @@ CHANGELOG
 -----
  * tree path edge definitions accept closures
 
+
+1.0 2022-03-03
+-----
+PropertyTreeBuilder changes: 
+ * rename `PropertyTreeBuilder` class into `PropertyTree` 
+ * let leaf Path (valuePath arg) be a Closure
+ * change variadic string groupByProperties into list<string|Closure> arg
+ * let properties (groupByProperties) path be a Closure
+ * add tree and PropertyAccessor getters
+ * add mode ARRAY_LEAF to append values to array-typed leaves when key path colision happens
