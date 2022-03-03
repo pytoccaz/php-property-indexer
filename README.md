@@ -2,13 +2,13 @@
 
 * A `PorpertyIndexer` indexes objects/arrays properties inside a key-value map.
 
-
 * A `PorpertyTree` builds a Tree structure from a collection of objects.
 
 
 `PorpertyIndexer` and `PropertyTree` are iterables. 
 
-*key* and *value* values are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
+Index *key* and *value* values one case,  nodes and leaves in the other are retreived from objects or arrays via [symfony/property-access](https://symfony.com/doc/current/components/property_access.html#usage) component.
+
 
 ## Installation
 
@@ -167,7 +167,7 @@ $tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['dat
 //   }
 ```
 
-### Porperty Tree modes ARRAY_LEAF 
+### Porperty Tree mode ARRAY_LEAF 
 
 Mind the possible colisions between objects sharing the "same" properties path:
 
@@ -201,7 +201,7 @@ $tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], 'value', ['dat
 
 `$valuePath` 2nd arg accepts a one-arg Closure (that must return int|string). While iterating the object|array collection, PorpertyTree will bind the arg with the current object|array item to extract a value.
 
-To retrieve the object items themselves, you may use an Identity Closure (or set `valuePath` to `null`) :
+To retrieve the object items themselves, you may use an Identity Closure ( or better set `valuePath` to `null` :P ) :
 
 ```php
 // Use an Idendity Closure to retrieve Objects themselves: 
@@ -243,6 +243,8 @@ $tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], null, [functio
 // is a complicated way to get the same resulting tree as : 
 $tree = new Obernard\PropertyIndexer\PropertyTree([$obj1, $obj2], null, ['id']);
 ```
+
+Those 2 examples are dumb-ones. Closures are for performing complex tasks (to retrieve path or leaves) that objects properties do not provide natively.
 
 ## Tests 
 
