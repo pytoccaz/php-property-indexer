@@ -94,7 +94,7 @@ class ArrayIndexerTest extends TestCase
         // $this->expectError();
         $this->expectException(UndefinedKeyException::class);
 
-        $this->expectErrorMessage('Undefined index key 1');
+        $this->expectExceptionMessage('Undefined index key 1');
 
         $dico = new PropertyIndexer('[id]', '[value]');
         $dico->get(1);

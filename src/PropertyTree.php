@@ -10,7 +10,7 @@
 
 namespace Obernard\PropertyIndexer;
 
-
+use Obernard\PropertyIndexer\Exception\GroupByPropertyBadValueException;
 
 /**
  * Given a collection of arrays|objets, builds a tree with leaves values and path provided by the items in the collection. 
@@ -63,9 +63,9 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
 
     /**
      * list of properties defining the the leaves path.  
-     * @var list<string|\Closure>  
+     * @var array<string|\Closure>  
      */
-    private array $groupByProperties = [];
+    private $groupByProperties = [];
 
     /** 
      * Compatible PropertyAccess path inside objects for retriving leaves values.
@@ -91,21 +91,22 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
     /**
      * @param iterable $collection Collection of compatible objects/arrays to load.
      * @param string|\Closure|null $valuePath Path of the property inside added objects/arrays providing a leaf value
-     * @param list<string|\Closure>|string|\Closure|null $groupByProperties Path of the properties inside added objects/arrays whose values define the leaves path inside the tree
+     * @param array<string|\Closure>|string|\Closure|null $groupByProperties Path of the properties inside added objects/arrays whose values define the leaves path inside the tree
      * 
      */
-    public function __construct(iterable $collection, string|\Closure|null $valuePath = null, array|string|\Closure|null $groupByProperties = null, $mode = self::SCALAR_LEAF)
+    public function __construct(iterable $collection = [], string|\Closure|null $valuePath = null, array|string|\Closure|null $groupByProperties = [], $mode = self::SCALAR_LEAF)
     {
 
 
         parent::__construct();
 
         if (is_array($groupByProperties)) {
-            self::checkGoupByPropertyTypes(...$groupByProperties);
+            self::checkPropertiesTypes(...$groupByProperties);
             $this->groupByProperties = $groupByProperties;
-        } else if (!!$groupByProperties)
+        } else if ($groupByProperties !== null) {
             $this->groupByProperties[] = $groupByProperties;
-
+        }
+        self::checkEachPropNonEmptyString($this->groupByProperties, "GoupByProperties items cannot be empty");
         $this->valuePath = $valuePath;
         $this->setMode($mode);
         $this->load($collection);
@@ -129,13 +130,21 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
             else
                 foreach ($this->groupByProperties as $path) {
 
-                    if (is_string($path))
-                        // concat the path edges
+                    if (is_string($path)) {
+                        // concat the path nodes
                         $leafPath->appendIndex(self::getPropertyFromObject($item, $path));
-
-                    else
+                    } else {
                         // call the closure on the object item and append the result to the path definition
-                        $leafPath->appendIndex($path($item));
+                        $res = self::toString($path($item));
+                        if ($res === false) {
+                            throw new Exception\InvalidClosureException("The closure has to return a stringable value");
+                        } else if (self::isStringEmpty($res)) {
+                            throw new Exception\InvalidClosureException("The stringyfied value has to be non-empty");
+                        } 
+
+
+                        $leafPath->appendIndex((string) $res);
+                    }
                 }
 
             // write the leaf
@@ -240,8 +249,48 @@ class PropertyTree extends PropertyPicker implements \Countable, \IteratorAggreg
         }
     }
 
-    public static function checkGoupByPropertyTypes(string|\Closure ...$groupByProperties): bool
+    private static function checkPropertiesTypes(...$args): bool
     {
+        foreach ($args as $arg) {
+            if (!self::isStringOrClosure($arg)) {
+                throw new Exception\InvalidPropertyException("GoupByProperties array has to be a list of string|Closure");
+            }
+        }
         return true;
+    }
+
+    private static function checkEachPropNonEmptyString(array $props, string $msg= ''): bool
+    {
+        foreach ($props as $prop) {
+
+            if (!is_string($prop))
+                continue;
+
+            if (self::isStringEmpty($prop)) {
+                throw new Exception\InvalidPropertyException($msg);
+            }
+        }
+        return true;
+    }
+
+
+
+    private static function isStringOrClosure($arg): bool
+    {
+        return is_string($arg) || ($arg instanceof \Closure);
+    }
+
+    private static function isStringEmpty(string $str): bool
+    {
+        return trim($str) === '';
+    }
+
+    private static function toString($arg): string|false
+    {
+        try {
+            return (string) $arg;
+        } catch (\Error $e) {
+            return false;
+        }
     }
 }

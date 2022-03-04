@@ -54,7 +54,7 @@ class PropertyPicker
         return self::getObjectAttr($object, $path);
     }
 
-    protected static function objectOrArrayValidator(object|array $object, string ...$properties): bool
+    protected static function objectOrArrayValidator(object|array $object, string|PropertyPathInterface ...$properties): bool
     {
         foreach ($properties as $property) {
 

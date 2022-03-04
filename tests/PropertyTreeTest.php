@@ -18,6 +18,9 @@ namespace Obernard\PropertyIndexer\Tests;
 use Obernard\PropertyIndexer\PropertyTree;
 use PHPUnit\Framework\TestCase;
 use Obernard\PropertyIndexer\Exception\OffsetSetException;
+use Obernard\PropertyIndexer\Exception\UndefinedModeException;
+use Obernard\PropertyIndexer\Exception\InvalidPropertyException;
+use Obernard\PropertyIndexer\Exception\InvalidClosureException;
 
 
 class PropertyBuilderTest extends TestCase
@@ -263,12 +266,101 @@ class PropertyBuilderTest extends TestCase
         $this->assertEquals($collection, $ptree3->toArray());
     }
 
-    public function testPropertiesType()
-    {
-        $props = ['test', function () {
-        }];
-        $test = PropertyTree::checkGoupByPropertyTypes(...$props);
+    // public function testPropertiesType()
+    // {
+    //     $props = ['test', function () {
+    //     }];
+    //     $test = PropertyTree::checkGoupByPropertyTypes(...$props);
 
-        $this->assertTrue($test);
+    //     $this->assertTrue($test);
+    // }
+
+    public function testGroupByPropertyNotStingOrClosureException()
+    {
+        $this->expectException(InvalidPropertyException::class);
+        $this->expectExceptionMessage('GoupByProperties array has to be a list of string|Closure');
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, [null]);
+ 
+    }
+
+    public function testGroupByPropertyEmptyException()
+    {
+        $this->expectException(InvalidPropertyException::class);
+        $this->expectExceptionMessage('GoupByProperties items cannot be empty');
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, ['']);
+ 
+    }
+    public function testGroupByPropertyEmptyException2()
+    {
+        $this->expectException(InvalidPropertyException::class);
+        $this->expectExceptionMessage('GoupByProperties items cannot be empty');
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, '');
+    }
+    public function testGroupByPropertyEmptyException3()
+    {
+        $this->expectException(InvalidPropertyException::class);
+        $this->expectExceptionMessage('GoupByProperties items cannot be empty');
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, ' ');
+    }
+
+    public function testGroupByPropertyEmptyException4()
+    {
+        $this->expectException(InvalidPropertyException::class);
+        $this->expectExceptionMessage('GoupByProperties items cannot be empty');
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, [' ']);
+ 
+    }
+
+    public function testBadModeException()
+    {
+        $this->expectException(UndefinedModeException::class);
+
+        $collection = self::getSimpleObjectsCollection(2);
+        $ptree = new PropertyTree($collection, null, null, 3);
+ 
+    }
+
+    public function testClosureResult()
+    {
+        $object1 = self::simpleObjectWithDate(1, 'value1');
+
+        $this->expectException(InvalidClosureException::class);
+        $this->expectExceptionMessage('The stringyfied value has to be non-empty');
+
+        $tree = new PropertyTree([$object1], null, function ($item) {
+            return null;
+        });
+ 
+    }
+
+    public function testClosureResult2()
+    {
+        $object1 = self::simpleObjectWithDate(1, 'value1');
+
+        $this->expectException(InvalidClosureException::class);
+        $this->expectExceptionMessage('The stringyfied value has to be non-empty');
+
+        $tree = new PropertyTree([$object1], null, function ($item) {
+            return false;
+        });
+ 
+    }
+
+
+    public function testClosureResult3()
+    {
+        $object1 = self::simpleObjectWithDate(1, 'value1');
+        $this->expectException(InvalidClosureException::class);
+        $this->expectExceptionMessage('The closure has to return a stringable value');
+
+        $tree = new PropertyTree([$object1], null, function ($item) {
+            return $item;
+        });
+ 
     }
 }

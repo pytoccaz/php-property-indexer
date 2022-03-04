@@ -1,8 +1,6 @@
 CHANGELOG
 =========
 
-
-
 0.1 2022-01-24
 -----
  * create `PropertyIndex` class 
@@ -29,3 +27,10 @@ PropertyTreeBuilder changes:
  * let properties (groupByProperties) path be a Closure
  * add tree and PropertyAccessor getters
  * add mode ARRAY_LEAF to append values to array-typed leaves when key path colision happens
+
+
+1.1 2022-03-04
+-----
+PropertyTreeBuilder changes: 
+ * groupByProperties props can be any stringable
+ * strengthen groupByProperties props control (closure props has to return non null value)
